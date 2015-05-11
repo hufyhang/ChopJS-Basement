@@ -4,6 +4,18 @@ $ch.define('basement', function () {
   var URL = 'http://feifeihang.info/basement/php/basement.php';
   var lastModified = {};
 
+  function interpretName(appName) {
+    var tokens = appName.split('::');
+    if (tokens.length < 2) {
+      tokens.push(0);
+    }
+
+    return {
+      appName: tokens[0],
+      version: tokens[1] + ''
+    };
+  }
+
   $$CHOP.basement = {};
   $$CHOP.basement = {
     top: function (appName, password, callback, errorCb) {
@@ -69,7 +81,11 @@ $ch.define('basement', function () {
       });
     },
 
-    pull: function (appName, password, version, callback, errorCb) {
+    pull: function (appName, password, callback, errorCb) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
+
       $$CHOP.http(URL, {
         method: 'post',
         data: {
@@ -92,7 +108,11 @@ $ch.define('basement', function () {
       });
     },
 
-    pullKey: function (appName, password, version, key, callback, errorCb) {
+    pullKey: function (appName, password, key, callback, errorCb) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
+
       $$CHOP.http(URL, {
         method: 'post',
         data: {
@@ -117,7 +137,11 @@ $ch.define('basement', function () {
     },
 
 
-    push: function (appName, password, version, json, callback) {
+    push: function (appName, password, json, callback) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
+
       json = JSON.stringify(json);
       $$CHOP.http(URL, {
         method: 'post',
@@ -138,7 +162,11 @@ $ch.define('basement', function () {
 
     },
 
-    update: function (appName, password, version, json, callback) {
+    update: function (appName, password, json, callback) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
+
       json = JSON.stringify(json);
       $$CHOP.http(URL, {
         method: 'post',
@@ -158,10 +186,10 @@ $ch.define('basement', function () {
       });
     },
 
-    watch: function (appName, password, version, interval, callback) {
+    watch: function (appName, password, interval, callback) {
       var that = this;
       window.setInterval(function () {
-        that.pull(appName, password, version, function (res) {
+        that.pull(appName, password, function (res) {
           if (res.LastModified !== lastModified[appName]) {
             lastModified[appName] = res.LastModified;
             if (callback) {
@@ -173,11 +201,11 @@ $ch.define('basement', function () {
     },
 
     keyBuffer: {},
-    watchKey: function (appName, password, version, key, interval, callback) {
+    watchKey: function (appName, password, key, interval, callback) {
       this.keyBuffer[appName] = {};
       var that = this;
       window.setInterval(function () {
-        that.pullKey(appName, password, version, key, function (res) {
+        that.pullKey(appName, password, key, function (res) {
           if (that.keyBuffer[appName][key] !== res.data) {
             that.keyBuffer[appName][key] = res.data;
             if (callback) {
