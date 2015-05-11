@@ -8,7 +8,7 @@ header('Cache-Control: no-cache'); // recommended to prevent caching of event da
 
 $opt = strtoupper($_POST['option']);
 $app = $_POST['app'];
-$password = $_POST['password'];
+$password = md5($_POST['password']);
 if (array_key_exists('version', $_POST)) {
     $version = $_POST['version'];
 } else {
