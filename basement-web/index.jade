@@ -1,0 +1,21 @@
+doctype html
+html(lang="en")
+  head
+    title ChopJS Basement Portal
+    link(rel="stylesheet"
+         href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css")
+    link(rel="stylesheet" href="css/vendor.css")
+    link(rel="stylesheet" href="css/style.css")
+
+  body(ch-scope="appScope")
+    div#toolbar
+      input#name-input(type="text" placeholder="Data storage name..."
+                       autofocus ch-data="name" ch-name="input" ch-event="keypress: liveSearch")
+      div#search-btn(ch-event="click: search")
+        i.fa.fa-search
+
+    div#wrapper
+      div#container(ch-name="container" ch-inline)
+        | <div class="list-item">{{name}}</div>
+
+    script(src="js/chopjs.js" ch-main="js/main.js")

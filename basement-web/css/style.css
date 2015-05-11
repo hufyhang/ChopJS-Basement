@@ -1,0 +1,64 @@
+body {
+  text-align: center;
+}
+
+#toolbar {
+  text-align: center;
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 0;
+  background: #fff;
+}
+
+#toolbar * {
+  display: inline-block;
+}
+
+#toolbar input {
+  width: 550px;
+  border: none;
+  border-bottom: 2px solid #000;
+  border-radius: 0;
+  padding: 7px 0;
+}
+
+#toolbar input:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  border-bottom: 2px solid #3498db;
+}
+
+#toolbar div {
+  color: #fff;
+  background: #3498db;
+  padding: 8px 20px;
+}
+
+#wrapper {
+  margin-top: 60px;
+  position: absolute;
+  left: 250px;
+  right: 250px;
+}
+
+.list-item {
+  font-size: 20px;
+  padding: 10px;
+  border-bottom: 1px dotted #9DB3D1;
+}
+
+.list-item:hover {
+  border-bottom: 1px solid #9DB3D1;
+}
+
+.create-btn {
+  background: #3498db;
+  color: #fff;
+  padding: 10px 20px;
+  display: inline-block;
+  cursor: pointer;
+}

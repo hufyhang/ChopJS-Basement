@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ChopJS Basement Portal</title>
+
+    <meta name="description" content="ChopJS Basement Data Storage.">
+    <meta name="keywords" content="ChopJS,basement,data,storage,data storage,database">
+    <meta name="author" content="Feifei Hang">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,minimun-scale=1,maximum-scale=1">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body ch-scope="appScope">
+    <div id="toolbar">
+      <input id="name-input" type="text" placeholder="Data storage name..." autofocus ch-data="name" ch-name="input" ch-event="keypress: liveSearch">
+      <!-- <div id="search-btn" ch-event="click: search"><i class="fa fa-search"></i></div> -->
+    </div>
+    <div id="wrapper">
+      <div id="container" ch-name="container" ch-inline><div class="list-item">{{name}}</div></div>
+    </div>
+
+    <script src="js/chopjs.js" ch-main="js/main.js"></script>
+    <script src="js/basement.js"></script>
+  </body>
+</html>
