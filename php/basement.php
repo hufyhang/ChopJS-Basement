@@ -100,7 +100,7 @@ function newVersion($app, $password, $db) {
     }
     else {
         $stmt->close();
-        return "{\"code\": 200, \"status\": \"ok\", \"version\": \"" .$version. "\"}";
+        return "{\"code\": 200, \"status\": \"ok\", \"version\": " .$version. "}";
     }
 
 }
@@ -183,7 +183,7 @@ function fetchDB($app, $password, $version, $db) {
         if ($version !== $ver) {
             continue;
         } else {
-            $res = "{\"code\": 200, \"status\": \"ok\", \"LastModified\": \"".$modified."\", \"version\":\"".$version."\", \"json\": \"".$json."\"}";
+            $res = "{\"code\": 200, \"status\": \"ok\", \"LastModified\": \"".$modified."\", \"version\":".$version.", \"json\": \"".$json."\"}";
         }
     }
 
@@ -215,7 +215,7 @@ function fetchKeyDB($app, $password, $version, $key, $db) {
         $target = str_replace("'", "%27", $target);
         $target = str_replace("\"", "%22", $target);
 
-        return "{\"code\": 200, \"status\": \"ok\", \"LastModified\": \"".$old['LastModified']."\", \"version\":\"".$version."\", \"json\": \"{%22data%22: ".$target."}\"}";
+        return "{\"code\": 200, \"status\": \"ok\", \"LastModified\": \"".$old['LastModified']."\", \"version\":".$version.", \"json\": \"{%22data%22: ".$target."}\"}";
     }
 }
 
@@ -253,7 +253,7 @@ function pushDB($app, $password, $version, $json, $db) {
 
     } else {
         $stmt->close();
-        return "{\"code\": 200, \"status\": \"ok\", \"version\":\"".$version."\"}";
+        return "{\"code\": 200, \"status\": \"ok\", \"version\":".$version."}";
     }
 }
 
