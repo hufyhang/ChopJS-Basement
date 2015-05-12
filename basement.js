@@ -1,7 +1,7 @@
 /* global $ch, $$CHOP */
 $ch.define('basement', function () {
   'use strict';
-  var URL = 'http://feifeihang.info/basement/php/basement.php';
+  var URL = 'http://feifeihang.info/basement/db';
   var lastModified = {};
 
   function interpretName(appName) {

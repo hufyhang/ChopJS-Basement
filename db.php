@@ -12,6 +12,7 @@ if (!array_key_exists('option', $_POST) ||
     !array_key_exists('app', $_POST) ||
     !array_key_exists('password', $_POST)) {
     echo "{\"code\": 500, \"status\": \"error\", \"error\": \"Bad parameters.\"}";
+    exit();
 }
 
 $opt = strtoupper($_POST['option']);
