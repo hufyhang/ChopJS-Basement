@@ -49,7 +49,11 @@ else {
         break;
 
         case 'UPDATE':
-        $response = updateDB($app, $password, $version, $_POST['json'], $db);
+        $response = updateKeyDB($app, $password, $version, $_POST['key'], $_POST['json'], $db);
+        break;
+
+        case 'REMOVE':
+        $response = removeKeyDB($app, $password, $version, $_POST['key'], $db);
         break;
 
         case 'CREATE':
@@ -263,6 +267,53 @@ function updateDB($app, $password, $version, $jsonStr, $db) {
         $json = json_decode(urldecode($json['json']), true);
         $new = json_decode($jsonStr, true);
         $json = json_encode(array_merge($json, $new));
+        return pushDB($app, $password, $version, $json, $db);
+    }
+}
+
+function updateKeyDB($app, $password, $version, $key, $value, $db) {
+    $res = fetchDB($app, $password, $version, $db);
+    $json = json_decode($res, true);
+    if ($json['code'] !== 200) {
+        return $res;
+    } else {
+        $json = urldecode($json['json']);
+        $json = json_decode($json, true);
+
+        $key = preg_replace('/\s+/', '', $key);
+        $tks = explode('>', $key);
+        $key = '';
+        foreach ($tks as $token) {
+            $key = $key . '["'. $token .'"]';
+        }
+
+        $value = json_decode($value, true);
+        eval('$json'.$key.' = $value;');
+
+        $json = json_encode($json);
+        return pushDB($app, $password, $version, $json, $db);
+    }
+}
+
+function removeKeyDB($app, $password, $version, $key, $db) {
+    $res = fetchDB($app, $password, $version, $db);
+    $json = json_decode($res, true);
+    if ($json['code'] !== 200) {
+        return $res;
+    } else {
+        $json = urldecode($json['json']);
+        $json = json_decode($json, true);
+
+        $key = preg_replace('/\s+/', '', $key);
+        $tks = explode('>', $key);
+        $key = '';
+        foreach ($tks as $token) {
+            $key = $key . '["'. $token .'"]';
+        }
+
+        eval('unset($json'.$key.');');
+
+        $json = json_encode($json);
         return pushDB($app, $password, $version, $json, $db);
     }
 }

@@ -162,7 +162,7 @@ $ch.define('basement', function () {
 
     },
 
-    update: function (appName, password, json, callback) {
+    update: function (appName, password, key, json, callback) {
       var tks = interpretName(appName);
       appName = tks.appName;
       var version = tks.version;
@@ -173,7 +173,31 @@ $ch.define('basement', function () {
         data: {
           option: 'update',
           app: appName,
+          key: key,
           json: json,
+          password: password,
+          version: version
+        },
+        done: function (res) {
+          res = JSON.parse(res.responseText);
+          if (callback) {
+            callback(res);
+          }
+        }
+      });
+    },
+
+    remove: function (appName, password, key, callback) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
+
+      $$CHOP.http(URL, {
+        method: 'post',
+        data: {
+          option: 'remove',
+          app: appName,
+          key: key,
           password: password,
           version: version
         },
