@@ -77,6 +77,11 @@ function retrieveApps(res, $scope) {
   if (res.code === 200) {
     var items = res.items;
     items = items.map(function (item) {
+      var option = $ch.element('option');
+      option.attr('value', item);
+
+      console.log($scope);
+      $scope.datalist.appendChild(option);
       return {name: item};
     });
 

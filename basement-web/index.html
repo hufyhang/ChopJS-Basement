@@ -14,7 +14,8 @@
   </head>
   <body ch-scope="appScope">
     <div id="toolbar">
-      <input id="name-input" type="text" placeholder="Data storage name..." autofocus ch-data="name" ch-name="input" ch-event="keypress: liveSearch">
+      <input id="name-input" type="text" placeholder="Data storage name..." autofocus ch-data="name" ch-name="input" ch-event="keypress: liveSearch" list="datalist">
+      <datalist id="datalist" ch-name="datalist"></datalist>
       <!-- <div id="search-btn" ch-event="click: search"><i class="fa fa-search"></i></div> -->
     </div>
     <div id="wrapper">
