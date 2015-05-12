@@ -8,6 +8,12 @@ header('Cache-Control: no-cache'); // recommended to prevent caching of event da
 
 define('MAX_LENGTH', 4294967295);
 
+if (!array_key_exists('option', $_POST) ||
+    !array_key_exists('app', $_POST) ||
+    !array_key_exists('password', $_POST)) {
+    echo "{\"code\": 500, \"status\": \"error\", \"error\": \"Bad parameters.\"}";
+}
+
 $opt = strtoupper($_POST['option']);
 $app = $_POST['app'];
 $password = md5($_POST['password']);
@@ -27,42 +33,66 @@ if ($db->connect_error) {
     $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Failed to connect to MySQL: " . $db->connect_error . "\"}";
 }
 else {
-    switch ($opt) {
-        case 'UPGRADE':
-        $response = newVersion($app, $password, $db);
-        break;
+    try {
+        switch ($opt) {
+            case 'UPGRADE':
+            $response = newVersion($app, $password, $db);
+            break;
 
-        case 'TOP':
-        $response = listVersions($app, $password, $db);
-        break;
+            case 'TOP':
+            $response = listVersions($app, $password, $db);
+            break;
 
-        case 'PULL':
-        $response = fetchDB($app, $password, $version, $db);
-        break;
+            case 'PULL':
+            $response = fetchDB($app, $password, $version, $db);
+            break;
 
-        case 'PULL KEY':
-        $response = fetchKeyDB($app, $password, $version, $_POST['key'], $db);
-        break;
+            case 'PULL KEY':
+            if (!array_key_exists('key', $_POST)) {
+                $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'key' parameter.\"}";
+            } else {
+                $response = fetchKeyDB($app, $password, $version, $_POST['key'], $db);
+            }
 
-        case 'PUSH':
-        $response = pushDB($app, $password, $version, $_POST['json'], $db);
-        break;
+            break;
 
-        case 'UPDATE':
-        $response = updateKeyDB($app, $password, $version, $_POST['key'], $_POST['json'], $db);
-        break;
+            case 'PUSH':
+            if (!array_key_exists('json', $_POST)) {
+                $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'JSON' parameter.\"}";
+            } else {
+                $response = pushDB($app, $password, $version, $_POST['json'], $db);
+            }
+            break;
 
-        case 'REMOVE':
-        $response = removeKeyDB($app, $password, $version, $_POST['key'], $db);
-        break;
+            case 'UPDATE':
+            if (!array_key_exists('key', $_POST) ||
+                !array_key_exists('json', $_POST)) {
+                $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'key' or 'JSON' parameter.\"}";
+            } else {
+                $response = updateKeyDB($app, $password, $version, $_POST['key'], $_POST['json'], $db);
+            }
+            break;
 
-        case 'CREATE':
-        $response = createDB($app, $password, $db);
-        break;
+            case 'REMOVE':
+            if (!array_key_exists('key', $_POST)) {
+                $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'key' parameter.\"}";
+            } else {
+                $response = removeKeyDB($app, $password, $version, $_POST['key'], $db);
+            }
+            break;
 
-        default:
-        $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Bad request.\"}";
-        break;
+            case 'CREATE':
+            $response = createDB($app, $password, $db);
+            break;
+
+            default:
+            $response = "{\"code\": 400, \"status\": \"error\", \"error\": \"Bad request.\"}";
+            break;
+        }
+    } catch (Exception $e) {
+        mysqli_close($db);
+
+        echo "{\"code\": 0, \"status\": \"unknown error\", \"error\": \"".$e->getMessage()."\"}";
     }
 }
 
