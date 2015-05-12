@@ -6,6 +6,8 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
 
+define('MAX_LENGTH', 4294967295);
+
 $opt = strtoupper($_POST['option']);
 $app = $_POST['app'];
 $password = md5($_POST['password']);
@@ -101,24 +103,29 @@ function newVersion($app, $password, $db) {
 
 function listVersions($app, $password, $db) {
 
-    $stmt = $db->prepare('SELECT password FROM Basement WHERE AppName = ?');
+    $stmt = $db->prepare('SELECT password, JSON FROM Basement WHERE AppName = ?');
     $stmt->bind_param('s', $app);
     $stmt->execute();
 
     $stmt->store_result();
 
-    $stmt->bind_result($pass);
+    $stmt->bind_result($pass, $json);
+    $sizes = array();
+    $count = 0;
     while ($stmt->fetch()) {
         if ($pass !== $password) {
             $stmt->close();
             return "{\"status\": \"error\", \"error\": \"wrong password.\", \"code\": 403}";
         }
+
+        $sizes[$count . ''] = floatval(number_format(strlen($json) / MAX_LENGTH, 3));
+        ++$count;
     }
     $rows = $stmt->num_rows - 1;
     $total = $rows + 1;
 
     $stmt->close();
-    return "{\"code\": 200, \"status\": \"ok\", \"total\": ". $total . ", \"top\": " . $rows ."}";
+    return "{\"code\": 200, \"status\": \"ok\", \"total\": ". $total . ", \"top\": " . $rows .", \"used\": " .json_encode($sizes). "}" ;
 
 }
 
@@ -261,5 +268,15 @@ function updateDB($app, $password, $version, $jsonStr, $db) {
 }
 
 mysqli_close($db);
-echo $response;
+
+function echobig($string, $bufferSize = 8192) {
+    header('Content-Length: ' . strlen($string));
+
+    $chuncks = str_split($string, $bufferSize);
+    foreach ($chuncks as $chunck) {
+        echo $chunck;
+    }
+}
+
+echobig($response);
 ?>
