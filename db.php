@@ -57,6 +57,15 @@ else {
 
             break;
 
+            case 'WATCH':
+            if (!array_key_exists('key', $_POST)) {
+                $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'key' parameter.\"}";
+            } else {
+                watchKeyDB($app, $password, $version, $_POST['key'], $db);
+            }
+
+            break;
+
             case 'PUSH':
             if (!array_key_exists('json', $_POST)) {
                 $response = "{\"code\": 500, \"status\": \"error\", \"error\": \"Missing 'JSON' parameter.\"}";
@@ -294,6 +303,48 @@ function fetchKeyDB($app, $password, $version, $key, $db) {
 
         return "{\"code\": 200, \"status\": \"ok\", \"LastModified\": \"".$old['LastModified']."\", \"version\":".$version.", \"json\": \"{%22data%22: ".$target."}\"}";
     }
+}
+
+function checkStatus($buffer) {
+    $json = json_decode($buffer, true);
+    $result = false;
+    if ($json['code'] == 200) {
+        $result = $json['json'];
+    }
+    return $result;
+}
+
+function watchKeyDB($app, $password, $version, $key, $db) {
+    $buffer = fetchKeyDB($app, $password, $version, $key, $db);
+    $status = checkStatus($buffer);
+    if (!$status) {
+        echo $buffer;
+        exit();
+    } else {
+        $buffer = $status;
+    }
+
+    $isChanged = false;
+
+    while (!$isChanged) {
+        sleep(2);
+
+        $temp = fetchKeyDB($app, $password, $version, $key, $db);
+        $copy = $temp;
+        $status = checkStatus($temp);
+        if (!$status) {
+            echo $temp;
+            exit();
+        }
+
+        $temp = $status;
+        if ($temp !== $buffer) {
+            echo $copy;
+            $isChanged = true;
+        }
+    }
+
+    exit();
 }
 
 function pushDB($app, $password, $version, $json, $db) {
