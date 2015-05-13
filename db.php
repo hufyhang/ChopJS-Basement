@@ -326,7 +326,7 @@ function watchKeyDB($app, $password, $version, $key, $db) {
 
     $isChanged = false;
 
-    while (!$isChanged) {
+    while (!connection_aborted() && !$isChanged) {
         sleep(2);
 
         $temp = fetchKeyDB($app, $password, $version, $key, $db);
