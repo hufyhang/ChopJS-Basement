@@ -229,6 +229,25 @@ function fetchKeyDB($app, $password, $version, $key, $db) {
     if ($json['code'] !== 200) {
         return $res;
     } else {
+        // retrieve range from $key.
+        $showAll = true;
+        $rangeFrom = 0;
+        $rangeTo = 0;
+
+        $rangeTks = explode("::", $key);
+        $key = trim($rangeTks[0]);
+        if (count($rangeTks) > 1) {
+            $showAll = false;
+
+            $rangeTks = explode("-", trim($rangeTks[1]));
+            if (count($rangeTks) == 1) {
+                $rangeTo = intval(trim($rangeTks[0]));
+            } else {
+                $rangeFrom = intval(trim($rangeTks[0]));
+                $rangeTo = intval(trim($rangeTks[1]));
+            }
+        }
+
         $json = json_decode(urldecode($json['json']), true);
         $keys = explode(">", $key);
         $target = $json;
@@ -241,6 +260,33 @@ function fetchKeyDB($app, $password, $version, $key, $db) {
                 $target = null;
             }
         }
+
+        // if don't need show all records, fetch the required ones within range.
+        if ($target !== null &&
+            $showAll == false &&
+            (is_object($target) || is_array($target))) {
+
+            if ($rangeTo >= count($target)) {
+                $rangeTo = $target;
+            }
+
+            $temp = array();
+            $count = 0;
+
+            foreach ($target as $key => $value) {
+                if ($count >= $rangeFrom) {
+                    $temp[$key] = $value;
+                }
+
+                if ($count == $rangeTo) {
+                    break;
+                }
+                ++$count;
+            }
+
+            $target = $temp;
+        }
+
         $target = json_encode($target);
         $target = str_replace(array('%'), "%25", $target);
         $target = str_replace("'", "%27", $target);
