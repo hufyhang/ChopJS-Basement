@@ -209,7 +209,7 @@ $ch.define('basement', function () {
       });
     },
 
-    watch: function (appName, password, key, callback) {
+    _watch: function (appName, password, key, once, callback) {
       var tks = interpretName(appName);
       appName = tks.appName;
       var version = tks.version;
@@ -228,9 +228,19 @@ $ch.define('basement', function () {
         done: function (res) {
           res = JSON.parse(res.responseText);
           callback(res);
-          that.watchKey(appName, password, key, callback);
+          if (!once) {
+            that.watch(appName, password, key, false, callback);
+          }
         }
       });
+    },
+
+    watch: function (appName, password, key, callback) {
+      this._watch(appName, password, key, false, callback);
+    },
+
+    watchOnce: function (appName, password, key, callback) {
+      this._watch(appName, password, key, true, callback);
     }
 
   };
