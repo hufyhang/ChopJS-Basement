@@ -2,7 +2,6 @@
 $ch.define('basement', function () {
   'use strict';
   var URL = 'http://feifeihang.info/basement/db';
-  var lastModified = {};
 
   function interpretName(appName) {
     var tokens = appName.split('::');
@@ -210,34 +209,28 @@ $ch.define('basement', function () {
       });
     },
 
-    watch: function (appName, password, interval, callback) {
-      var that = this;
-      window.setInterval(function () {
-        that.pull(appName, password, function (res) {
-          if (res.LastModified !== lastModified[appName]) {
-            lastModified[appName] = res.LastModified;
-            if (callback) {
-              callback(res);
-            }
-          }
-        });
-      }, interval);
-    },
+    watch: function (appName, password, key, callback) {
+      var tks = interpretName(appName);
+      appName = tks.appName;
+      var version = tks.version;
 
-    keyBuffer: {},
-    watchKey: function (appName, password, key, interval, callback) {
-      this.keyBuffer[appName] = {};
       var that = this;
-      window.setInterval(function () {
-        that.pullKey(appName, password, key, function (res) {
-          if (that.keyBuffer[appName][key] !== res.data) {
-            that.keyBuffer[appName][key] = res.data;
-            if (callback) {
-              callback(res);
-            }
-          }
-        });
-      }, interval);
+
+      $$CHOP.http(URL, {
+        method: 'post',
+        data: {
+          option: 'watch',
+          app: appName,
+          key: key,
+          password: password,
+          version: version
+        },
+        done: function (res) {
+          res = JSON.parse(res.responseText);
+          callback(res);
+          that.watchKey(appName, password, key, callback);
+        }
+      });
     }
 
   };
